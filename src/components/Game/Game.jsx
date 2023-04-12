@@ -11,8 +11,12 @@ const Square = ({ value, onClick }) => {
 const Board = () => {
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
+  const [gameOver, setGameOver] = useState(false);
 
   const handleClick = (i) => {
+    if (gameOver) {
+      return;
+    }
     const newSquares = squares.slice();
     if (calculateWinner(squares) || newSquares[i]) {
       return;
@@ -20,6 +24,9 @@ const Board = () => {
     newSquares[i] = xIsNext ? "X" : "O";
     setSquares(newSquares);
     setXIsNext(!xIsNext);
+    if (calculateWinner(newSquares) || newSquares.every((square) => square != null)) {
+      setGameOver(true);
+    }
   };
 
   const renderSquare = (i) => {
@@ -35,6 +42,12 @@ const Board = () => {
   } else {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
+
+  const playAgain = () => {
+    setSquares(Array(9).fill(null));
+    setXIsNext(true);
+    setGameOver(false);
+  };
 
   return (
     <div>
@@ -54,6 +67,7 @@ const Board = () => {
         {renderSquare(7)}
         {renderSquare(8)}
       </div>
+      {gameOver && <button className="btn" onClick={playAgain}>Play Again</button>}
     </div>
   );
 };
@@ -67,6 +81,7 @@ const Game = () => {
     </div>
   );
 };
+
 
 const calculateWinner = (squares) => {
   const lines = [
